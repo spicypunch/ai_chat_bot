@@ -4,7 +4,7 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 import '../domain/gemini_repository.dart';
 
 class GeminiRepositoryImpl implements GeminiRepository {
-  static const String apiKey = "";
+  static const String apiKey = "GeminiAPIKey";
   static const String modelName = "gemini-2.0-flash";
 
   late GenerativeModel _model;
