@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, TargetPlatform;
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
@@ -35,29 +37,36 @@ class ChatModel extends ChangeNotifier {
 
   Future<void> _initTts() async {
     await flutterTts.setLanguage("ko-KR");
-    await flutterTts.setSpeechRate(1.0);
+
+    double speechRate = 1.0;
+    if (defaultTargetPlatform == TargetPlatform.android ||
+        defaultTargetPlatform == TargetPlatform.iOS) {
+      speechRate = 0.5;
+    }
+
+    await flutterTts.setSpeechRate(speechRate);
     await flutterTts.setPitch(1.0);
     await flutterTts.setVolume(1.0);
   }
 
   Future<void> _initSpeech() async {
-    speech.statusListener = (status) {
-      print("음성 인식 상태: $status");
-      if (status == 'done') {
-        _handleSpeechResults();
-      } else if (status == 'notListening') {
+    bool available = await speech.initialize(
+      onStatus: (status) {
+        print("음성 인식 상태: $status");
+        if (status == 'done') {
+          _handleSpeechResults();
+        } else if (status == 'notListening') {
+          _isListening = false;
+          notifyListeners();
+        }
+      },
+      onError: (error) {
+        print("음성 인식 오류: $error");
         _isListening = false;
         notifyListeners();
-      }
-    };
+      },
+    );
 
-    speech.errorListener = (error) {
-      print("음성 인식 오류: $error");
-      _isListening = false;
-      notifyListeners();
-    };
-
-    bool available = await speech.initialize();
     if (!available) {
       print("음성 인식을 사용할 수 없습니다");
     }
@@ -95,9 +104,9 @@ class ChatModel extends ChangeNotifier {
             _recognizedText = result.recognizedWords;
             notifyListeners();
           },
-          listenFor: Duration(seconds: 30),     // 최대 30초 동안 듣기
-          pauseFor: Duration(seconds: 3),       // 5초 동안 말이 없으면 자동 종료
-          localeId: "ko_KR",                    // 한국어 설정
+          listenFor: Duration(seconds: 30), // 최대 30초 동안 듣기
+          pauseFor: Duration(seconds: 3), // 3초 동안 말이 없으면 자동 종료
+          localeId: "ko_KR",
         );
       } catch (e) {
         print("음성 인식 시작 오류: $e");
@@ -111,14 +120,16 @@ class ChatModel extends ChangeNotifier {
     if (_isListening) {
       await speech.stop();
       _isListening = false;
-      final textToSend = _recognizedText;
 
-      if (textToSend.isNotEmpty) {
-        Future.delayed(Duration(milliseconds: 100), () {
-          sendMessageToGemini(textToSend);
-        });
-        _recognizedText = "";
-      }
+      // final textToSend = _recognizedText;
+      // if (textToSend.isNotEmpty) {
+      //   Future.delayed(Duration(milliseconds: 100), () {
+      //     sendMessageToGemini(textToSend);
+      //   });
+      //   _recognizedText = "";
+      // }
+
+      _recognizedText = "";
 
       notifyListeners();
     }
@@ -162,6 +173,8 @@ class ChatModel extends ChangeNotifier {
     notifyListeners();
 
     try {
+      await stopSpeaking();
+
       addMessage("...", "ai");
       String fullResponse = "";
 
