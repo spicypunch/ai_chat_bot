@@ -1,8 +1,8 @@
-import 'package:ai_chat_bot/presentation/user_message_view.dart';
+import 'package:ai_chat_bot/presentation/chat/user_message_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../provider/chat_model.dart';
+import 'chat_view_model.dart';
 import 'ai_message_view.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -25,7 +25,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final chatModel = Provider.of<ChatModel>(context);
+    final chatModel = Provider.of<ChatViewModel>(context);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (scrollController.hasClients) {
@@ -118,7 +118,7 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget _buildMessageInput(BuildContext context, ChatModel chatModel) {
+  Widget _buildMessageInput(BuildContext context, ChatViewModel chatModel) {
     if (chatModel.isListening &&
         chatModel.recognizedText.isNotEmpty &&
         textController.text != chatModel.recognizedText) {

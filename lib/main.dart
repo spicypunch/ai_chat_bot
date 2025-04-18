@@ -1,5 +1,6 @@
-import 'package:ai_chat_bot/presentation/chat_screen.dart';
-import 'package:ai_chat_bot/provider/chat_model.dart';
+import 'package:ai_chat_bot/presentation/chat/chat_screen.dart';
+import 'package:ai_chat_bot/presentation/entry/entry_screen.dart';
+import 'package:ai_chat_bot/presentation/chat/chat_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,10 +13,11 @@ void main() {
   final GeminiRepository geminiRepository = GeminiRepositoryImpl();
   runApp(
     ChangeNotifierProvider(
-      create: (context) => ChatModel(geminiRepository: geminiRepository),
+      create: (context) => ChatViewModel(geminiRepository: geminiRepository),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: ChatScreen(),
+        home: EntryScreen(),
+        // home: ChatScreen(),
       ),
     ),
   );

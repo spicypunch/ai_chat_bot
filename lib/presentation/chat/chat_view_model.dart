@@ -4,9 +4,9 @@ import 'package:flutter/foundation.dart'
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
-import '../domain/gemini_repository.dart';
+import '../../domain/gemini_repository.dart';
 
-class ChatModel extends ChangeNotifier {
+class ChatViewModel extends ChangeNotifier {
   final GeminiRepository geminiRepository;
   final FlutterTts flutterTts = FlutterTts();
   final stt.SpeechToText speech = stt.SpeechToText();
@@ -14,7 +14,7 @@ class ChatModel extends ChangeNotifier {
   bool _isListening = false;
   String _recognizedText = "";
 
-  ChatModel({required this.geminiRepository}) {
+  ChatViewModel({required this.geminiRepository}) {
     _initializeGemini();
     _initTts();
     _initSpeech();
